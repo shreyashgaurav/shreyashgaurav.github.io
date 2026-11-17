@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shreyash Gaurav</title>
+<meta name="description" content="Shreyash Gaurav is a backend and machine learning engineer working on C++ systems, vision-language models and graph clustering research.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #ffffff;
+    --ink: #1b1d21;
+    --grey: #61656d;
+    --rule: #e3e4e6;
+    --green: #2b5d4a;
+
+    --sans: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+    --serif: "Source Serif 4", Georgia, serif;
+
+    --page: 1040px;
+    --gutter: 220px;
+    --gap: 48px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 18px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  a { color: var(--green); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, var(--green) 35%, transparent); transition: text-decoration-color .2s; }
+  a:hover { text-decoration-color: var(--green); }
+  a:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; border-radius: 2px; }
+
+  .page { max-width: var(--page); margin: 0 auto; padding: 0 40px; }
+
+  /* Header */
+  .top {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 36px 0;
+    font-family: var(--sans); font-size: 15px;
+  }
+  .top .name { color: var(--ink); text-decoration: none; font-weight: 600; }
+  .top nav { display: flex; gap: 28px; }
+  .top nav a { color: var(--grey); text-decoration: none; }
+  .top nav a:hover { color: var(--ink); }
+
+  /* Intro */
+  .intro { padding: 112px 0 128px; }
+  .intro h1 {
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: clamp(34px, 4.6vw, 54px);
+    line-height: 1.14;
+    letter-spacing: -0.022em;
+    max-width: 17em;
+  }
+  .intro .lede {
+    margin-top: 36px;
+    max-width: 34em;
+    color: var(--grey);
+    font-size: 19px;
+  }
+  .intro .links {
+    margin-top: 40px;
+    display: flex; flex-wrap: wrap; gap: 10px 28px;
+    font-family: var(--sans); font-size: 15px;
+  }
+
+  /* Sections */
+  .block {
+    display: grid;
+    grid-template-columns: var(--gutter) 1fr;
+    gap: var(--gap);
+    padding: 64px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .block > h2 {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--grey);
+    line-height: 1.9;
+  }
+  .block .body { max-width: 640px; }
+
+  .entry + .entry { margin-top: 48px; }
+  #education .entry + .entry { margin-top: 24px; }
+  .entry h3 {
+    font-family: var(--sans);
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.4;
+  }
+  .meta {
+    font-family: var(--sans);
+    font-size: 14.5px;
+    color: var(--grey);
+    margin-top: 2px;
+  }
+  .entry p { margin-top: 14px; }
+  .entry ul { margin-top: 14px; padding-left: 1.1em; }
+  .entry li { margin-bottom: 8px; padding-left: 4px; }
+  .entry li::marker { color: var(--grey); }
+  .entry .stack { margin-top: 14px; font-family: var(--sans); font-size: 14.5px; color: var(--grey); }
+
+  /* Publications */
+  .pubs { list-style: none; }
+  .pubs li { display: grid; grid-template-columns: 56px 1fr; gap: 20px; }
+  .pubs li + li { margin-top: 26px; }
+  .pubs .year { font-family: var(--sans); font-size: 14.5px; color: var(--grey); padding-top: 3px; font-variant-numeric: tabular-nums; }
+  .pubs .title { line-height: 1.5; }
+  .pubs .venue { font-style: italic; color: var(--grey); font-size: 16.5px; margin-top: 2px; }
+
+  /* Skills */
+  .skills { display: grid; grid-template-columns: 150px 1fr; gap: 14px 24px; }
+  .skills dt { font-family: var(--sans); font-size: 15px; font-weight: 500; padding-top: 2px; }
+  .skills dd { color: var(--grey); }
+
+  /* Contact */
+  .contact-line {
+    font-family: var(--sans);
+    font-size: clamp(24px, 3vw, 32px);
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    line-height: 1.3;
+  }
+  .contact-line a { text-decoration-thickness: 1.5px; text-underline-offset: 6px; }
+  .body .note { margin-top: 20px; color: var(--grey); max-width: 32em; }
+
+  footer {
+    border-top: 1px solid var(--rule);
+    padding: 32px 0 56px;
+    font-family: var(--sans); font-size: 14px; color: var(--grey);
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  }
+
+  /* Tablet */
+  @media (max-width: 900px) {
+    :root { --gutter: 150px; --gap: 32px; }
+    .intro { padding: 80px 0 96px; }
+  }
+
+  /* Mobile */
+  @media (max-width: 680px) {
+    body { font-size: 17px; }
+    .page { padding: 0 22px; }
+    .top { flex-direction: column; gap: 10px; padding: 26px 0; }
+    .top nav { gap: 18px; flex-wrap: wrap; }
+    .intro { padding: 56px 0 72px; }
+    .intro .lede { font-size: 18px; margin-top: 26px; }
+    .block { grid-template-columns: 1fr; gap: 20px; padding: 48px 0; }
+    .skills { grid-template-columns: 1fr; gap: 2px; }
+    .skills dd { margin-bottom: 14px; }
+    .pubs li { grid-template-columns: 1fr; gap: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) { a { transition: none; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="top">
+    <a class="name" href="#">Shreyash Gaurav</a>
+    <nav aria-label="Sections">
+      <a href="#work">Work</a>
+      <a href="#projects">Projects</a>
+      <a href="#publications">Publications</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="intro">
+      <h1>I build fast systems in C++ and machine learning models that hold up under honest evaluation.</h1>
+      <p class="lede">I'm a backend and ML engineer with a master's in computer science from NIT Rourkela. Until July I was at Samsung Research in Bangalore, fine-tuning vision-language models for scene text recognition. My research is on graph clustering. I'm looking for SDE and ML roles in India or remote.</p>
+      <div class="links">
+        <a href="https://github.com/shreyashgaurav/shreyashgaurav/blob/main/Shreyash_Gaurav_Resume.pdf" target="_blank" rel="noopener">Resume (PDF)</a>
+        <a href="https://github.com/shreyashgaurav" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://linkedin.com/in/shreyashgaurav/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://scholar.google.com/citations?user=rAtB6ZYAAAAJ&hl=en" target="_blank" rel="noopener">Google Scholar</a>
+      </div>
+    </section>
+
+    <section class="block" id="work">
+      <h2>Work</h2>
+      <div class="body">
+        <article class="entry">
+          <h3>Samsung Research Institute, Bangalore</h3>
+          <div class="meta">Developer Intern, Platform Intelligence team, January to July 2026</div>
+          <p>I built an agentic pipeline that reads text in real-world photos and decides whether each piece should be translated or transliterated.</p>
+          <ul>
+            <li>Raised named-entity F1 from 0.45 to 0.70 by fine-tuning Qwen3-VL-2B with LoRA. It matches the 8B model's quality at about a quarter of the inference cost.</li>
+            <li>Chained OpenCV text localization, PaddleOCR v5 and Qwen3-VL into three LangGraph agents that handle more than 13 languages.</li>
+            <li>Replaced manual annotation with labels distilled from the 8B model, then validated and split about 20,000 images for training.</li>
+            <li>Presented the system at Tech Glanz, Samsung's internal technology summit.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="block" id="projects">
+      <h2>Projects</h2>
+      <div class="body">
+        <article class="entry">
+          <h3>Duplicate image detection engine</h3>
+          <div class="meta">July to September 2026, <a href="https://github.com/shreyashgaurav" target="_blank" rel="noopener">source on GitHub</a></div>
+          <p>A C++20 engine that finds near-duplicate images in large collections. It uses perceptual hashing, SIMD Hamming matching and union-find clustering. A trained nine-feature classifier makes the final call instead of a fixed hash threshold, reaching 97.8% precision and 98.7% recall on 1,200 labelled pairs.</p>
+          <p>It processes 187 images a second on one thread. When it ran 15 times slower on one machine, profiling showed the cause was cross-filesystem I/O, not the CPU. Corrupt files are logged in a versioned JSON report instead of stopping the run, and 50 tests run under sanitizers in CI.</p>
+          <div class="stack">C++20, Python, CMake, libjpeg-turbo, scikit-learn, GoogleTest</div>
+        </article>
+
+        <article class="entry">
+          <h3>FinDocAI</h3>
+          <div class="meta">August 2026 to now, <a href="https://github.com/shreyashgaurav" target="_blank" rel="noopener">source on GitHub</a></div>
+          <p>A question-answering service over SEC 10-K and 10-Q filings and earnings decks. Every answer cites the page it came from. Text is embedded with SBERT and slides with CLIP, so it can retrieve from charts as well as prose.</p>
+          <p>I'm evaluating it on 40 hand-written questions, measuring Recall@5, answer accuracy and whether it declines unanswerable questions, against a baseline with no retrieval.</p>
+          <div class="stack">Python, FastAPI, SBERT, CLIP, ChromaDB, Gemini, Docker</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="block" id="publications">
+      <h2>Publications</h2>
+      <div class="body">
+        <ul class="pubs">
+          <li>
+            <span class="year">2026</span>
+            <div>
+              <div class="title">Graph Clustering via Similarity Aware Embeddings with an MLP-based Learning Strategy</div>
+              <div class="venue">ACM Symposium on Applied Computing (SAC), about 23% acceptance rate</div>
+            </div>
+          </li>
+          <li>
+            <span class="year">2025</span>
+            <div>
+              <div class="title">Multi-Scale Diffusion Enhancement for Graph Clustering with Heat and PPR Kernels</div>
+              <div class="venue">ACM IKDD CODS-COMAD, Young Researchers Symposium</div>
+            </div>
+          </li>
+          <li>
+            <span class="year">2025</span>
+            <div>
+              <div class="title">Attributed Modularity Loss for Improved Graph Clustering</div>
+              <div class="venue">ACM IKDD CODS</div>
+            </div>
+          </li>
+          <li>
+            <span class="year">2025</span>
+            <div>
+              <div class="title">G-DMoNLite: A Novel Modularity-Based Approach for Graph Clustering</div>
+              <div class="venue">IEEE IC2SDT</div>
+            </div>
+          </li>
+          <li>
+            <span class="year">2024</span>
+            <div>
+              <div class="title">Classification of Plant Disease using a State-of-the-Art Deep Learning Algorithm on a Tesla GPU</div>
+              <div class="venue">International Journal of Computing, volume 23, issue 2</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="block" id="skills">
+      <h2>Skills</h2>
+      <div class="body">
+        <dl class="skills">
+          <dt>Languages</dt>
+          <dd>C++17/20, Python, Java, JavaScript, C, Shell</dd>
+          <dt>Machine learning</dt>
+          <dd>PyTorch, LoRA fine-tuning, LangGraph, RAG, SBERT, CLIP, OpenCV, scikit-learn, CUDA</dd>
+          <dt>Backend</dt>
+          <dd>FastAPI, REST APIs, Node.js, Express, React</dd>
+          <dt>Data</dt>
+          <dd>MySQL, MongoDB, ChromaDB</dd>
+          <dt>Tooling</dt>
+          <dd>Git, GitHub Actions, Docker, CMake, GoogleTest, Linux</dd>
+        </dl>
+      </div>
+    </section>
+
+    <section class="block" id="education">
+      <h2>Education</h2>
+      <div class="body">
+        <article class="entry">
+          <h3>National Institute of Technology, Rourkela</h3>
+          <div class="meta">M.Tech in Computer Science, 2024 to 2026, CGPA 8.45</div>
+        </article>
+        <article class="entry">
+          <h3>Guru Ghasidas Vishwavidyalaya, Bilaspur</h3>
+          <div class="meta">B.Tech in Computer Science and Engineering, 2020 to 2024, CGPA 9.31</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="block" id="contact">
+      <h2>Contact</h2>
+      <div class="body">
+        <p class="contact-line"><a href="mailto:shreyash2856@gmail.com">shreyash2856@gmail.com</a></p>
+        <p class="note">Email is the best way to reach me about roles, research or open-source work. You can also find me on <a href="https://linkedin.com/in/shreyashgaurav/" target="_blank" rel="noopener">LinkedIn</a> and <a href="https://leetcode.com/shreyash_gaurav/" target="_blank" rel="noopener">LeetCode</a>.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>Shreyash Gaurav, 2026</span>
+    <a href="#">Back to top</a>
+  </footer>
+
+</div>
+</body>
+</html>
