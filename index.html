@@ -103,7 +103,7 @@
   .block .body { max-width: 640px; }
 
   .entry + .entry { margin-top: 48px; }
-  #education .entry + .entry { margin-top: 24px; }
+  #education .entry + .entry, #now .entry + .entry { margin-top: 32px; }
   .entry h3 {
     font-family: var(--sans);
     font-size: 19px;
@@ -240,6 +240,21 @@
           <p>A question-answering service over SEC 10-K and 10-Q filings and earnings decks. Every answer cites the page it came from. Text is embedded with SBERT and slides with CLIP, so it can retrieve from charts as well as prose.</p>
           <p>I'm evaluating it on 40 hand-written questions, measuring Recall@5, answer accuracy and whether it declines unanswerable questions, against a baseline with no retrieval.</p>
           <div class="stack">Python, FastAPI, SBERT, CLIP, ChromaDB, Gemini, Docker</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="block" id="now">
+      <h2>Now</h2>
+      <div class="body">
+        <article class="entry">
+          <h3>CMU 15-213, Introduction to Computer Systems</h3>
+          <div class="meta">Self-study with the public lectures and labs</div>
+          <p>Finished everything up to and including machine-level programming. The memory hierarchy is next.</p>
+        </article>
+        <article class="entry">
+          <h3>Go</h3>
+          <div class="meta">Learning the language</div>
         </article>
       </div>
     </section>
