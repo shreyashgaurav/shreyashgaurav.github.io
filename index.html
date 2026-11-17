@@ -5,6 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Shreyash Gaurav</title>
 <meta name="description" content="Shreyash Gaurav is a backend and machine learning engineer working on C++ systems, vision-language models and graph clustering research.">
+<link rel="canonical" href="https://shreyashgaurav.github.io/">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%232b5d4a'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='Helvetica,Arial,sans-serif' font-size='28' font-weight='600' fill='%23ffffff'%3ESG%3C/text%3E%3C/svg%3E">
+<meta name="theme-color" content="#ffffff">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://shreyashgaurav.github.io/">
+<meta property="og:title" content="Shreyash Gaurav, backend and ML engineer">
+<meta property="og:description" content="C++ systems, vision-language models and graph clustering research. Previously at Samsung Research, Bangalore. M.Tech CS, NIT Rourkela.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Shreyash Gaurav, backend and ML engineer">
+<meta name="twitter:description" content="C++ systems, vision-language models and graph clustering research. Previously at Samsung Research, Bangalore.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
@@ -121,6 +131,8 @@
   .pubs .title { line-height: 1.5; }
   .pubs .venue { font-style: italic; color: var(--grey); font-size: 16.5px; margin-top: 2px; }
 
+  .more { margin-top: 32px; color: var(--grey); }
+
   /* Skills */
   .skills { display: grid; grid-template-columns: 150px 1fr; gap: 14px 24px; }
   .skills dt { font-family: var(--sans); font-size: 15px; font-weight: 500; padding-top: 2px; }
@@ -183,9 +195,9 @@
   <main>
     <section class="intro">
       <h1>I build fast systems in C++ and machine learning models that hold up under honest evaluation.</h1>
-      <p class="lede">I'm a backend and ML engineer with a master's in computer science from NIT Rourkela. Until July I was at Samsung Research in Bangalore, fine-tuning vision-language models for scene text recognition. My research is on graph clustering. I'm looking for SDE and ML roles in India or remote.</p>
+      <p class="lede">I'm a backend and ML engineer with a master's in computer science from NIT Rourkela. In 2026 I was a developer intern at Samsung Research in Bangalore, fine-tuning vision-language models for scene text recognition. My research is on graph clustering. I'm looking for SDE and ML roles in India or remote.</p>
       <div class="links">
-        <a href="https://github.com/shreyashgaurav/shreyashgaurav/blob/main/Shreyash_Gaurav_Resume.pdf" target="_blank" rel="noopener">Resume (PDF)</a>
+        <a href="resume.pdf" target="_blank" rel="noopener">Resume (PDF)</a>
         <a href="https://github.com/shreyashgaurav" target="_blank" rel="noopener">GitHub</a>
         <a href="https://linkedin.com/in/shreyashgaurav/" target="_blank" rel="noopener">LinkedIn</a>
         <a href="https://scholar.google.com/citations?user=rAtB6ZYAAAAJ&hl=en" target="_blank" rel="noopener">Google Scholar</a>
@@ -214,7 +226,7 @@
       <div class="body">
         <article class="entry">
           <h3>Duplicate image detection engine</h3>
-          <div class="meta">July to September 2026, <a href="https://github.com/shreyashgaurav" target="_blank" rel="noopener">source on GitHub</a></div>
+          <div class="meta">July to September 2026, <a href="https://github.com/shreyashgaurav/deja-view" target="_blank" rel="noopener">source on GitHub</a></div>
           <p>A C++20 engine that finds near-duplicate images in large collections. It uses perceptual hashing, SIMD Hamming matching and union-find clustering. A trained nine-feature classifier makes the final call instead of a fixed hash threshold, reaching 97.8% precision and 98.7% recall on 1,200 labelled pairs.</p>
           <p>It processes 187 images a second on one thread. When it ran 15 times slower on one machine, profiling showed the cause was cross-filesystem I/O, not the CPU. Corrupt files are logged in a versioned JSON report instead of stopping the run, and 50 tests run under sanitizers in CI.</p>
           <div class="stack">C++20, Python, CMake, libjpeg-turbo, scikit-learn, GoogleTest</div>
@@ -222,7 +234,7 @@
 
         <article class="entry">
           <h3>FinDocAI</h3>
-          <div class="meta">August 2026 to now, <a href="https://github.com/shreyashgaurav" target="_blank" rel="noopener">source on GitHub</a></div>
+          <div class="meta">August 2026 to now, <a href="https://github.com/shreyashgaurav/findocai" target="_blank" rel="noopener">source on GitHub</a></div>
           <p>A question-answering service over SEC 10-K and 10-Q filings and earnings decks. Every answer cites the page it came from. Text is embedded with SBERT and slides with CLIP, so it can retrieve from charts as well as prose.</p>
           <p>I'm evaluating it on 40 hand-written questions, measuring Recall@5, answer accuracy and whether it declines unanswerable questions, against a baseline with no retrieval.</p>
           <div class="stack">Python, FastAPI, SBERT, CLIP, ChromaDB, Gemini, Docker</div>
@@ -270,6 +282,7 @@
             </div>
           </li>
         </ul>
+        <p class="more">Full texts and citations are on <a href="https://scholar.google.com/citations?user=rAtB6ZYAAAAJ&hl=en" target="_blank" rel="noopener">Google Scholar</a>.</p>
       </div>
     </section>
 
