@@ -54,10 +54,25 @@
 
   /* Header */
   .top {
-    display: flex; justify-content: space-between; align-items: baseline;
-    padding: 36px 0;
+    position: sticky; top: 0; z-index: 10;
+    background: var(--paper);
+    border-bottom: 1px solid transparent;
+    transition: border-color .2s;
     font-family: var(--sans); font-size: 15px;
   }
+  .top.scrolled { border-bottom-color: var(--rule); }
+  .top-inner {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding-top: 26px; padding-bottom: 22px;
+  }
+  .top nav a[aria-current="true"] {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--ink);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 7px;
+  }
+  section[id] { scroll-margin-top: 72px; }
   .top .name { color: var(--ink); text-decoration: none; font-weight: 600; font-size: 24px; letter-spacing: -0.015em; line-height: 1.2; }
   .top nav { display: flex; gap: 28px; }
   .top nav a { color: var(--grey); text-decoration: none; }
@@ -123,6 +138,23 @@
   .entry li::marker { color: var(--grey); }
   .entry .stack { margin-top: 14px; font-family: var(--sans); font-size: 14.5px; color: var(--grey); }
 
+  /* Projects: breaks the label/content pattern on purpose */
+  .block.wide { display: block; }
+  .block.wide > h2 { margin-bottom: 36px; }
+  .block .body.project-grid {
+    max-width: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+  }
+  .project-grid .entry + .entry { margin-top: 0; }
+  .project-grid .entry {
+    border-top: 2px solid var(--ink);
+    padding-top: 22px;
+  }
+  .project-grid .entry h3 { font-size: 24px; letter-spacing: -0.015em; line-height: 1.25; }
+  .project-grid .entry .meta { margin-top: 6px; }
+
   /* Publications */
   .pubs { list-style: none; }
   .pubs li { display: grid; grid-template-columns: 56px 1fr; gap: 20px; }
@@ -160,14 +192,17 @@
   @media (max-width: 900px) {
     :root { --gutter: 150px; --gap: 32px; }
     .intro { padding: 80px 0 96px; }
+    .block .body.project-grid { grid-template-columns: 1fr; gap: 56px; max-width: 640px; }
   }
 
   /* Mobile */
   @media (max-width: 680px) {
     body { font-size: 17px; }
     .page { padding: 0 22px; }
-    .top { flex-direction: column; gap: 10px; padding: 26px 0; }
-    .top .name { font-size: 22px; }
+    .top-inner { flex-direction: column; gap: 8px; padding-top: 16px; padding-bottom: 14px; }
+    .top .name { font-size: 20px; }
+    .top nav { gap: 20px; }
+    section[id] { scroll-margin-top: 84px; }
     .top nav { gap: 18px; flex-wrap: wrap; }
     .intro { padding: 56px 0 72px; }
     .intro .lede { font-size: 18px; margin-top: 26px; }
@@ -181,9 +216,8 @@
 </style>
 </head>
 <body>
-<div class="page">
-
-  <header class="top">
+<header class="top" id="top">
+  <div class="page top-inner">
     <a class="name" href="#">Shreyash Gaurav</a>
     <nav aria-label="Sections">
       <a href="#work">Work</a>
@@ -191,8 +225,10 @@
       <a href="#publications">Publications</a>
       <a href="#contact">Contact</a>
     </nav>
-  </header>
+  </div>
+</header>
 
+<div class="page">
   <main>
     <section class="intro">
       <h1>I build fast systems in C++ and machine learning models that hold up under honest evaluation.</h1>
@@ -223,9 +259,9 @@
       </div>
     </section>
 
-    <section class="block" id="projects">
+    <section class="block wide" id="projects">
       <h2>Projects</h2>
-      <div class="body">
+      <div class="body project-grid">
         <article class="entry">
           <h3>Duplicate image detection engine</h3>
           <div class="meta">July to September 2026, <a href="https://github.com/shreyashgaurav/deja-view" target="_blank" rel="noopener">source on GitHub</a></div>
@@ -350,5 +386,24 @@
   </footer>
 
 </div>
+<script>
+  (function () {
+    var header = document.getElementById('top');
+    var links = Array.prototype.slice.call(header.querySelectorAll('nav a'));
+    var targets = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    function update() {
+      header.classList.toggle('scrolled', window.scrollY > 8);
+      var line = header.offsetHeight + 40, active = -1;
+      targets.forEach(function (t, i) { if (t && t.getBoundingClientRect().top <= line) active = i; });
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) active = links.length - 1;
+      links.forEach(function (a, i) {
+        if (i === active) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+      });
+    }
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  })();
+</script>
 </body>
 </html>
