@@ -160,26 +160,52 @@
   .entry li::marker { color: var(--grey); }
   .entry .stack { margin-top: 14px; font-family: var(--sans); font-size: 14.5px; color: var(--grey); }
 
-  /* Projects: breaks the label/content pattern on purpose */
+  /* Projects: breaks the label/content pattern on purpose.
+     One project per row: text on the left, its pipeline on the right. */
   .block.wide { display: block; }
   .block.wide > h2 { margin-bottom: 36px; }
-  .block .body.project-grid {
-    max-width: none;
+  .block .body.project-list { max-width: none; }
+  .project {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 64px;
-  }
-  .project-grid .entry + .entry { margin-top: 0; }
-  .project-grid .entry {
+    grid-template-columns: minmax(0, 1fr) 360px;
+    grid-template-areas: "head fig" "rest fig";
+    grid-template-rows: auto 1fr;
+    column-gap: 72px;
     border-top: 2px solid var(--ink);
     padding-top: 22px;
   }
-  .project-grid .entry h3 { font-size: 24px; letter-spacing: -0.015em; line-height: 1.25; }
-  .project-grid .entry .meta { margin-top: 6px; }
+  .project + .project { margin-top: 72px; }
+  .project .p-head { grid-area: head; }
+  .project .p-rest { grid-area: rest; }
+  .project .pipeline-fig { grid-area: fig; }
+  .project h3 { font-size: 24px; letter-spacing: -0.015em; line-height: 1.25; }
+  .project .meta { margin-top: 6px; }
   .figures { display: flex; flex-wrap: wrap; gap: 12px 36px; margin-top: 22px; font-family: var(--sans); }
   .figures div { display: flex; flex-direction: column; }
-  .figures .fig { font-size: 28px; font-weight: 500; letter-spacing: -0.02em; line-height: 1.15; font-variant-numeric: tabular-nums; }
+  .figures .fig { font-size: 28px; font-weight: 500; letter-spacing: -0.02em; line-height: 1.15; }
   .figures .cap { font-size: 14px; color: var(--grey); }
+
+  .pipeline-fig { margin: 4px 0 0; }
+  .pipeline-fig figcaption { font-family: var(--sans); font-size: 14.5px; color: var(--grey); margin-bottom: 12px; }
+  .pipeline { list-style: none; font-family: var(--sans); }
+  .pipeline li {
+    position: relative;
+    display: grid; grid-template-columns: 17px 1fr; column-gap: 14px;
+    padding: 6px 0; margin: 0;
+  }
+  .pipeline li:not(:last-child)::after {
+    content: ""; position: absolute; left: 8px; top: 18px; bottom: -18px;
+    width: 1px; background: #c4c6ca;
+  }
+  .pipeline .dot {
+    position: relative; z-index: 1;
+    width: 9px; height: 9px; margin: 7px 0 0 4px;
+    border: 1.5px solid var(--ink); border-radius: 50%; background: var(--paper);
+  }
+  .pipeline .stage { display: block; font-size: 15px; font-weight: 500; line-height: 1.45; }
+  .pipeline .how { display: block; font-size: 13.5px; color: var(--grey); line-height: 1.4; }
+  .pipeline li.key .dot { background: var(--green); border-color: var(--green); }
+  .pipeline li.key .stage { color: var(--green); }
   .entry p strong { font-family: var(--sans); font-weight: 600; font-size: 0.95em; }
 
   /* Publications */
@@ -219,7 +245,10 @@
   @media (max-width: 900px) {
     :root { --gutter: 150px; --gap: 32px; }
     .intro { padding: 80px 0 96px; }
-    .block .body.project-grid { grid-template-columns: 1fr; gap: 56px; max-width: 640px; }
+    .block .body.project-list { max-width: 640px; }
+    .project { grid-template-columns: 1fr; grid-template-areas: "head" "fig" "rest"; grid-template-rows: auto; }
+    .project .pipeline-fig { margin: 28px 0 8px; }
+    .project + .project { margin-top: 56px; }
   }
 
   /* Mobile */
@@ -293,28 +322,60 @@
 
     <section class="block wide" id="projects">
       <h2>Projects</h2>
-      <div class="body project-grid">
-        <article class="entry">
-          <h3>Duplicate image detection engine</h3>
-          <div class="meta">July to September 2026, <a href="https://github.com/shreyashgaurav/deja-view" target="_blank" rel="noopener">source on GitHub</a></div>
-          <div class="figures">
-            <div><span class="fig">97.8%</span><span class="cap">precision</span></div>
-            <div><span class="fig">98.7%</span><span class="cap">recall</span></div>
-            <div><span class="fig">187/s</span><span class="cap">images, one thread</span></div>
+      <div class="body project-list">
+
+        <article class="entry project">
+          <div class="p-head">
+            <h3>DejaView</h3>
+            <div class="meta">July to September 2026, <a href="https://shreyashgaurav.github.io/deja-view" target="_blank" rel="noopener">live demo</a>, <a href="https://github.com/shreyashgaurav/deja-view" target="_blank" rel="noopener">source on GitHub</a></div>
+            <div class="figures">
+              <div><span class="fig">97.8%</span><span class="cap">precision</span></div>
+              <div><span class="fig">98.7%</span><span class="cap">recall</span></div>
+              <div><span class="fig">187/s</span><span class="cap">images, one thread</span></div>
+            </div>
+            <p>A C++ tool that finds duplicate and near-duplicate photos, using a trained model instead of one fixed cutoff. Precision and recall were measured on 1,200 labelled pairs.</p>
           </div>
-          <p>A C++20 engine that finds near-duplicate images in large collections. It uses perceptual hashing, SIMD Hamming matching and union-find clustering. A trained nine-feature classifier makes the final call instead of a fixed hash threshold, measured on 1,200 labelled pairs.</p>
-          <p><strong>A 15× slowdown that wasn't the CPU.</strong> On one machine the engine ran 15 times slower. Profiling traced it to cross-filesystem I/O, so the fix was in where the data lived, not in the code.</p>
-          <p>Corrupt files are logged in a versioned JSON report instead of stopping the run, and 50 tests run under sanitizers in CI.</p>
-          <div class="stack">C++20, Python, CMake, libjpeg-turbo, scikit-learn, GoogleTest</div>
+          <figure class="pipeline-fig">
+            <figcaption>How it works</figcaption>
+            <ol class="pipeline">
+              <li><span class="dot"></span><span><span class="stage">Scan and exact duplicates</span><span class="how">Magic bytes, FNV-1a, byte-by-byte check</span></span></li>
+              <li><span class="dot"></span><span><span class="stage">Decode</span><span class="how">libjpeg-turbo 1/8 scaled decode, libpng</span></span></li>
+              <li><span class="dot"></span><span><span class="stage">Fingerprint</span><span class="how">aHash, dHash, pHash with a hand-written DCT</span></span></li>
+              <li><span class="dot"></span><span><span class="stage">Candidate filter</span><span class="how">Hamming distance with hardware popcount</span></span></li>
+              <li><span class="dot"></span><span><span class="stage">Classifier</span><span class="how">Logistic regression over 9 pair features</span></span></li>
+              <li><span class="dot"></span><span><span class="stage">Cluster</span><span class="how">Union-find, weak links can't merge groups</span></span></li>
+              <li><span class="dot"></span><span><span class="stage">Report</span><span class="how">Versioned JSON with the evidence for every match</span></span></li>
+            </ol>
+          </figure>
+          <div class="p-rest">
+            <p><strong>A 15× slowdown that wasn't the CPU.</strong> Reading photos from a Windows drive through WSL ran at 12 images a second, against 187 on native Linux storage. A release build only helped 1.3×, which showed the work was I/O-bound.</p>
+            <p>It only reports and never deletes or moves a file. Corrupt files are logged as errors instead of stopping the run, and 50 tests run under sanitizers in CI.</p>
+            <div class="stack">C++20, Python, CMake, libjpeg-turbo, scikit-learn, GoogleTest</div>
+          </div>
         </article>
 
-        <article class="entry">
-          <h3>FinDocAI</h3>
-          <div class="meta">August 2026 to now, <a href="https://github.com/shreyashgaurav/findocai" target="_blank" rel="noopener">source on GitHub</a></div>
-          <p>A question-answering service over SEC 10-K and 10-Q filings and earnings decks. Every answer cites the page it came from. Text is embedded with SBERT and slides with CLIP, so it can retrieve from charts as well as prose.</p>
-          <p>I'm evaluating it on 40 hand-written questions, measuring Recall@5, answer accuracy and whether it declines unanswerable questions, against a baseline with no retrieval.</p>
-          <div class="stack">Python, FastAPI, SBERT, CLIP, ChromaDB, Gemini, Docker</div>
+        <article class="entry project">
+          <div class="p-head">
+            <h3>FinDocAI</h3>
+            <div class="meta">August 2026 to now, <a href="https://github.com/shreyashgaurav/findocai" target="_blank" rel="noopener">source on GitHub</a></div>
+            <p>A question-answering service over SEC 10-K and 10-Q filings and earnings decks. Every answer cites the page it came from. Text is embedded with SBERT and slides with CLIP, so it can retrieve from charts as well as prose.</p>
+          </div>
+          <figure class="pipeline-fig">
+            <figcaption>How it works</figcaption>
+            <ol class="pipeline">
+              <li><span class="dot"></span><span><span class="stage">Ingest</span><span class="how">10-K and 10-Q filings and earnings decks, split by page</span></span></li>
+              <li><span class="dot"></span><span><span class="stage">Embed</span><span class="how">Text with SBERT, slides with CLIP</span></span></li>
+              <li><span class="dot"></span><span><span class="stage">Index</span><span class="how">ChromaDB vector store</span></span></li>
+              <li><span class="dot"></span><span><span class="stage">Retrieve</span><span class="how">Best-matching pages from both text and slides</span></span></li>
+              <li><span class="dot"></span><span><span class="stage">Answer</span><span class="how">Gemini answers with page citations, or declines</span></span></li>
+            </ol>
+          </figure>
+          <div class="p-rest">
+            <p>I'm evaluating it on 40 hand-written questions, measuring Recall@5, answer accuracy and whether it declines unanswerable questions, against a baseline with no retrieval.</p>
+            <div class="stack">Python, FastAPI, SBERT, CLIP, ChromaDB, Gemini, Docker</div>
+          </div>
         </article>
+
       </div>
     </section>
 
