@@ -77,6 +77,7 @@
   .top nav { display: flex; gap: 28px; }
   .top nav a { color: var(--grey); text-decoration: none; }
   .top nav a:hover { color: var(--ink); }
+  .top nav .short { display: none; }
 
   /* Intro */
   .intro { padding: 112px 0 128px; }
@@ -94,6 +95,27 @@
     color: var(--grey);
     font-size: 19px;
   }
+  .status {
+    margin-top: 28px;
+    display: flex; align-items: flex-start; gap: 10px;
+    font-family: var(--sans); font-size: 16px; font-weight: 500; line-height: 1.5;
+  }
+  .status .dot {
+    position: relative; flex: none;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #2f9e5b;
+    margin-top: 8px;
+  }
+  .status .dot::after {
+    content: ""; position: absolute; inset: 0; border-radius: 50%;
+    background: #2f9e5b;
+    animation: pulse 2.4s ease-out infinite;
+  }
+  @keyframes pulse {
+    0% { transform: scale(1); opacity: .45; }
+    70%, 100% { transform: scale(2.6); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) { .status .dot::after { animation: none; display: none; } }
   .intro .links {
     margin-top: 40px;
     display: flex; flex-wrap: wrap; gap: 10px 28px;
@@ -154,6 +176,11 @@
   }
   .project-grid .entry h3 { font-size: 24px; letter-spacing: -0.015em; line-height: 1.25; }
   .project-grid .entry .meta { margin-top: 6px; }
+  .figures { display: flex; flex-wrap: wrap; gap: 12px 36px; margin-top: 22px; font-family: var(--sans); }
+  .figures div { display: flex; flex-direction: column; }
+  .figures .fig { font-size: 28px; font-weight: 500; letter-spacing: -0.02em; line-height: 1.15; font-variant-numeric: tabular-nums; }
+  .figures .cap { font-size: 14px; color: var(--grey); }
+  .entry p strong { font-family: var(--sans); font-weight: 600; font-size: 0.95em; }
 
   /* Publications */
   .pubs { list-style: none; }
@@ -201,9 +228,11 @@
     .page { padding: 0 22px; }
     .top-inner { flex-direction: column; gap: 8px; padding-top: 16px; padding-bottom: 14px; }
     .top .name { font-size: 20px; }
-    .top nav { gap: 20px; }
+    .top nav { width: 100%; justify-content: space-between; gap: 12px; font-size: 14.5px; }
+    .top nav a { white-space: nowrap; }
+    .top nav .long { display: none; }
+    .top nav .short { display: inline; }
     section[id] { scroll-margin-top: 84px; }
-    .top nav { gap: 18px; flex-wrap: wrap; }
     .intro { padding: 56px 0 72px; }
     .intro .lede { font-size: 18px; margin-top: 26px; }
     .block { grid-template-columns: 1fr; gap: 20px; padding: 48px 0; }
@@ -212,6 +241,7 @@
     .pubs li { grid-template-columns: 1fr; gap: 0; }
   }
 
+  @media (max-width: 360px) { .top nav { font-size: 13px; gap: 6px; } }
   @media (prefers-reduced-motion: reduce) { a { transition: none; } }
 </style>
 </head>
@@ -222,7 +252,8 @@
     <nav aria-label="Sections">
       <a href="#work">Work</a>
       <a href="#projects">Projects</a>
-      <a href="#publications">Publications</a>
+      <a href="#publications"><span class="long">Publications</span><span class="short">Papers</span></a>
+      <a href="#education">Education</a>
       <a href="#contact">Contact</a>
     </nav>
   </div>
@@ -232,7 +263,8 @@
   <main>
     <section class="intro">
       <h1>I build fast systems in C++ and machine learning models that hold up under honest evaluation.</h1>
-      <p class="lede">I'm a backend and ML engineer with a master's in computer science from NIT Rourkela. In 2026 I was a developer intern at Samsung Research in Bangalore, fine-tuning vision-language models for scene text recognition. My research is on graph clustering. I'm looking for SDE and ML roles in India or remote.</p>
+      <p class="lede">I'm a backend and ML engineer with a master's in computer science from NIT Rourkela. In 2026 I was a developer intern at Samsung Research in Bangalore, fine-tuning vision-language models for scene text recognition. My research is on graph clustering.</p>
+      <p class="status"><span class="dot" aria-hidden="true"></span>Open to SDE and ML roles in India or remote, and interviewing now</p>
       <div class="links">
         <a href="resume.pdf" target="_blank" rel="noopener">Resume (PDF)</a>
         <a href="https://github.com/shreyashgaurav" target="_blank" rel="noopener">GitHub</a>
@@ -265,8 +297,14 @@
         <article class="entry">
           <h3>Duplicate image detection engine</h3>
           <div class="meta">July to September 2026, <a href="https://github.com/shreyashgaurav/deja-view" target="_blank" rel="noopener">source on GitHub</a></div>
-          <p>A C++20 engine that finds near-duplicate images in large collections. It uses perceptual hashing, SIMD Hamming matching and union-find clustering. A trained nine-feature classifier makes the final call instead of a fixed hash threshold, reaching 97.8% precision and 98.7% recall on 1,200 labelled pairs.</p>
-          <p>It processes 187 images a second on one thread. When it ran 15 times slower on one machine, profiling showed the cause was cross-filesystem I/O, not the CPU. Corrupt files are logged in a versioned JSON report instead of stopping the run, and 50 tests run under sanitizers in CI.</p>
+          <div class="figures">
+            <div><span class="fig">97.8%</span><span class="cap">precision</span></div>
+            <div><span class="fig">98.7%</span><span class="cap">recall</span></div>
+            <div><span class="fig">187/s</span><span class="cap">images, one thread</span></div>
+          </div>
+          <p>A C++20 engine that finds near-duplicate images in large collections. It uses perceptual hashing, SIMD Hamming matching and union-find clustering. A trained nine-feature classifier makes the final call instead of a fixed hash threshold, measured on 1,200 labelled pairs.</p>
+          <p><strong>A 15× slowdown that wasn't the CPU.</strong> On one machine the engine ran 15 times slower. Profiling traced it to cross-filesystem I/O, so the fix was in where the data lived, not in the code.</p>
+          <p>Corrupt files are logged in a versioned JSON report instead of stopping the run, and 50 tests run under sanitizers in CI.</p>
           <div class="stack">C++20, Python, CMake, libjpeg-turbo, scikit-learn, GoogleTest</div>
         </article>
 
@@ -391,11 +429,22 @@
     var header = document.getElementById('top');
     var links = Array.prototype.slice.call(header.querySelectorAll('nav a'));
     var targets = links.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+    var clicked = -1;
+    links.forEach(function (a, i) { a.addEventListener('click', function () { clicked = i; update(); }); });
+    ['wheel', 'touchstart', 'keydown'].forEach(function (ev) {
+      window.addEventListener(ev, function () { clicked = -1; }, { passive: true });
+    });
     function update() {
       header.classList.toggle('scrolled', window.scrollY > 8);
-      var line = header.offsetHeight + 40, active = -1;
+      // Reading line sits just under the header, then slides down the screen over the
+      // last stretch of the page so short sections near the end each get their turn.
+      var vh = window.innerHeight, base = header.offsetHeight + 40;
+      var remaining = document.documentElement.scrollHeight - vh - window.scrollY;
+      var zone = vh * 0.6, line = base;
+      if (remaining < zone) line = base + (vh - 40 - base) * (1 - Math.max(remaining, 0) / zone);
+      var active = -1;
       targets.forEach(function (t, i) { if (t && t.getBoundingClientRect().top <= line) active = i; });
-      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) active = links.length - 1;
+      if (clicked > -1) active = clicked;
       links.forEach(function (a, i) {
         if (i === active) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
       });
