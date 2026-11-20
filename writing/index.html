@@ -1,0 +1,27 @@
+---
+layout: default
+title: Writing
+description: Notes and essays by Shreyash Gaurav on systems, machine learning and the projects behind them.
+permalink: /writing/
+---
+<section class="page-head">
+  <h1>Writing</h1>
+  <p class="lede">Notes on systems, machine learning and the projects behind them. You can also follow along via <a href="{{ '/feed.xml' | relative_url }}">RSS</a>.</p>
+</section>
+<section class="page-list">
+  {%- if site.posts.size > 0 %}
+  <ul class="posts">
+    {%- for post in site.posts %}
+    <li>
+      <a class="post-title" href="{{ post.url | relative_url }}">{{ post.title }}</a>
+      <div class="post-meta"><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%-d %B %Y" }}</time></div>
+      {%- if post.description %}
+      <p>{{ post.description }}</p>
+      {%- endif %}
+    </li>
+    {%- endfor %}
+  </ul>
+  {%- else %}
+  <p class="empty">Nothing here yet. The first post is on its way.</p>
+  {%- endif %}
+</section>

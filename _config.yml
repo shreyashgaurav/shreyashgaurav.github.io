@@ -1,0 +1,31 @@
+# Site settings for Jekyll, which GitHub Pages runs on every push.
+title: Shreyash Gaurav
+description: Shreyash Gaurav is a backend and machine learning engineer working on C++ systems, vision-language models and graph clustering research.
+# Shown when the homepage is shared on LinkedIn, WhatsApp, X and so on
+share_title: Shreyash Gaurav, backend and ML engineer
+share_description: C++ systems, vision-language models and graph clustering research. Previously at Samsung Research, Bangalore. M.Tech CS, NIT Rourkela.
+author: Shreyash Gaurav
+url: https://shreyashgaurav.github.io
+baseurl: ""
+timezone: Asia/Kolkata          # so "Updated on" and post dates use Indian time
+
+# Posts live at /writing/<post-name>/
+permalink: /writing/:title/
+
+markdown: kramdown
+kramdown:
+  input: GFM                    # GitHub-style Markdown: ``` code fences, tables, etc.
+  syntax_highlighter: rouge     # colours code blocks
+  math_engine: mathjax          # lets $$...$$ through for KaTeX to render
+
+plugins:
+  - jekyll-feed                 # RSS feed at /feed.xml
+
+feed:
+  path: feed.xml
+
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - vendor
