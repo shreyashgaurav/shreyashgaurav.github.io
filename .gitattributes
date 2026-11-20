@@ -1,4 +1,4 @@
-﻿# Store text files with Unix line endings in the repo, whatever the OS
+# Store text files with Unix line endings in the repo, whatever the OS
 * text=auto eol=lf
 # Leave binary files untouched
 *.pdf binary
