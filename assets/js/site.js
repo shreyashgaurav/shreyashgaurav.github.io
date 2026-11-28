@@ -72,8 +72,11 @@
 // the swing (shoot, pendulum arc, springy legs in the air, thread) is from your new code,
 // with a slower start and finish. When the cursor is idle, it roams nearby, and a click
 // close in front of it scares it away for a moment.
+// Switched off, it walks back to the spider button and shrinks into the button's icon;
+// switched on, it grows back out of the icon.
 (function () {
   var btn = document.querySelector('.spider-toggle');
+  var icon = btn && btn.querySelector('svg');
   var allowed = window.matchMedia('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)');
   if (!btn || !allowed.matches) return;
 
@@ -114,9 +117,29 @@
   var TRACK_MAX = 220;
   var L1 = 23, L2 = 25;       // leg span your swing uses to keep feet within reach (48px)
 
+  // Going home: switched off, it walks back to the button and turns into the icon
+  var HOME_TIME = 1.6;        // walks fast enough to cover the distance in about this long...
+  var HOME_MAX_SPEED = 700;   // ...but no faster than this (px per second), and never slower than a normal walk
+  var MERGE_TIME = 0.55;      // shrinking into the icon (seconds)
+  var EMERGE_TIME = 0.55;     // growing back out of it
+  var STRIKE_TIME = 0.22;     // the strike-through clears before it grows out
+  // The icon, in its own 24x24 units (from the SVG in the header): where the spider's body,
+  // abdomen and head go, and each leg's hip, knee and foot, [left legs, right legs], front to back
+  var ICON_BODY = [12, 9.8];
+  var ICON_ABDOMEN = { x: 12, y: 13.5, along: 3.4, across: 2.6 };
+  var ICON_HEAD = { x: 12, y: 8.6, r: 1.7 };
+  var ICON_LINE = 1.4;
+  var ICON_LEGS = [
+    [[[10, 9.5], [7, 6.5], [4.5, 7.5]], [[9.8, 12], [5.5, 10.5], [3, 12.5]],
+     [[9.8, 14.5], [5.5, 15.5], [4, 18.5]], [[10.4, 16.5], [8, 19.5], [8.5, 21.5]]],
+    [[[14, 9.5], [17, 6.5], [19.5, 7.5]], [[14.2, 12], [18.5, 10.5], [21, 12.5]],
+     [[14.2, 14.5], [18.5, 15.5], [20, 18.5]], [[13.6, 16.5], [16, 19.5], [15.5, 21.5]]]
+  ];
+
   var canvas, ctx, raf = 0, on = false, last = 0, elapsed = 0, dpr = 1, W = 0, H = 0;
   var mouse = null, body = null, legs = [], mode = 'walk', thread = null, loose = [], stillFor = 0;
   var roam = null, roamWait = 0, flee = null;
+  var morph = 0, homeSpeed = 0, arrived = 0, emergeWait = 0;   // 0 = full spider, 1 = the icon
 
   function hyp(x, y) { return Math.sqrt(x * x + y * y); }
   function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
@@ -171,6 +194,7 @@
   }
 
   function goal() {
+    if (!mouse) return { x: body.x, y: body.y };
     var dx = body.x - mouse.x, dy = body.y - mouse.y, d = hyp(dx, dy);
     if (d <= GAP) return { x: body.x, y: body.y };
     return { x: mouse.x + dx / d * GAP, y: mouse.y + dy / d * GAP };
@@ -330,7 +354,7 @@
 
   function walk(dt) {
     var g = goal(), maxSpeed = MAX_SPEED;
-    if (stillFor > ROAM_AFTER) {
+    if (stillFor > ROAM_AFTER && mouse) {
       var r = roamTarget(dt);
       g = r || { x: body.x, y: body.y };
       maxSpeed = ROAM_SPEED;
@@ -347,7 +371,7 @@
 
   function stepLegs(dt) {
     // Plant feet about half a stride ahead, so each leg swings evenly around its hip
-    var stepTime = mode === 'flee' ? FLEE_STEP_TIME : STEP_TIME;
+    var stepTime = mode === 'flee' || mode === 'home' ? FLEE_STEP_TIME : STEP_TIME;
     var speed = hyp(body.vx, body.vy), leadLen = Math.min(speed * stepTime * 1.2, MAX_LEAD);
     var lead = speed ? { x: body.vx / speed * leadLen, y: body.vy / speed * leadLen } : { x: 0, y: 0 };
     var settling = speed < 15;
@@ -414,12 +438,75 @@
     }
   }
 
+  // ---------- Going home: back into the button's icon ----------
+
+  // The icon on screen: its 24x24 units mapped to window pixels
+  function iconBox() {
+    var r = icon.getBoundingClientRect(), s = r.width / 24;
+    return { s: s, p: function (u, v) { return { x: r.left + u * s, y: r.top + v * s }; } };
+  }
+  function iconShown() { var r = icon.getBoundingClientRect(); return r.width > 0 && r.height > 0; }
+
+  // Walk to the icon, fast when far, then face up like the icon and let the feet settle
+  function goHome(dt) {
+    var g = iconBox().p(ICON_BODY[0], ICON_BODY[1]);
+    var dx = g.x - body.x, dy = g.y - body.y, dist = hyp(dx, dy);
+    if (!homeSpeed) homeSpeed = clamp(dist / HOME_TIME, MAX_SPEED, HOME_MAX_SPEED);
+    var move = dist < 0.5 ? dist : Math.min(dist * (1 - Math.exp(-dt * 9)), homeSpeed * dt);
+    var mx = dist ? dx / dist * move : 0, my = dist ? dy / dist * move : 0;
+    body.x += mx; body.y += my;
+    body.vx = mx / dt; body.vy = my / dt;
+    if (dist > 40 && hyp(body.vx, body.vy) > 20) turnTo(Math.atan2(body.vy, body.vx), 10, dt);
+    else turnTo(-Math.PI / 2, 9, dt);
+
+    var facing = Math.abs(Math.atan2(Math.sin(body.a + Math.PI / 2), Math.cos(body.a + Math.PI / 2))) < 0.06;
+    var still = legs.every(function (l) { return l.t < 0; });
+    arrived = dist < 1 ? arrived + dt : 0;
+    if ((arrived > 0.08 && facing && still) || arrived > 0.6) { mode = 'merge'; morph = 0; }
+  }
+
+  // Shrunk into the icon: hide the spider and draw the strike-through across the icon
+  function finishOff(animate) {
+    stopLoop();
+    body = null; thread = null; loose = []; mode = 'walk'; roam = null; flee = null; morph = 0;
+    if (canvas) { ctx.clearRect(0, 0, W, H); canvas.style.display = 'none'; }
+    btn.classList.remove('homing', 'strike-out');
+    if (animate) replay('strike-in');
+  }
+  function replay(cls) {
+    btn.classList.remove('strike-in', 'strike-out');
+    void btn.offsetWidth;                 // restart the CSS animation
+    btn.classList.add(cls);
+  }
+
   function update(dt) {
-    if (!mouse || !body) return;
+    if (!body) return;
     elapsed += dt;
     stillFor += dt;
     loose = loose.filter(function (q) { q.retract += dt / RETRACT_TIME; return q.retract < 1; });
 
+    // Switched off: finish any swing, then walk home and shrink into the icon.
+    // Switched back on part-way: carry on from wherever it got to.
+    if (!on) {
+      if (mode === 'walk' || mode === 'flee') { mode = 'home'; flee = null; roam = null; homeSpeed = 0; arrived = 0; }
+      else if (mode === 'emerge') mode = 'merge';
+    } else if (mode === 'home') mode = 'walk';
+    else if (mode === 'merge') mode = 'emerge';
+
+    if (mode === 'home') { goHome(dt); stepLegs(dt); return; }
+    if (mode === 'merge') {
+      morph = Math.min(1, morph + dt / MERGE_TIME);
+      if (morph >= 1) finishOff(true);
+      return;
+    }
+    if (mode === 'emerge') {
+      if (emergeWait > 0) { emergeWait -= dt; return; }   // let the strike-through clear first
+      morph = Math.max(0, morph - dt / EMERGE_TIME);
+      if (morph <= 0) mode = 'walk';
+      return;
+    }
+
+    if (!mouse) return;
     var dist = hyp(mouse.x - body.x, mouse.y - body.y);
     if (mode === 'walk' && dist > SWING_DIST && loose.length === 0 && stillFor > SETTLE) {
       startSwing();
@@ -435,9 +522,70 @@
 
   // ---------- Drawing (earlier look; thread timing from your new code) ----------
 
+  // What gets drawn, as points and sizes: the spider as it stands...
+  function pose() {
+    var ca = Math.cos(body.a), sa = Math.sin(body.a);
+    return {
+      color: INK, w1: 2, w2: 1.2,
+      legs: legs.map(function (l) {
+        var hip = at(body.a + l.side * l.ang, HIP);
+        var lift = l.t >= 0 ? Math.sin(Math.PI * l.t) * LIFT : 0;
+        return [hip, knee(hip, l.foot, l.side, l.bend, lift), l.foot];
+      }),
+      abdomen: { x: body.x - 9 * ca, y: body.y - 9 * sa, rx: 8.5, ry: 6.8, rot: body.a },
+      head: { x: body.x + NECK * ca, y: body.y + NECK * sa, rx: 5.6, ry: 4.8, rot: body.a }
+    };
+  }
+  // ...the button's icon, in the same terms...
+  function iconPose() {
+    var b = iconBox(), s = b.s, ab = b.p(ICON_ABDOMEN.x, ICON_ABDOMEN.y), hd = b.p(ICON_HEAD.x, ICON_HEAD.y);
+    return {
+      color: getComputedStyle(btn).color, w1: ICON_LINE * s, w2: ICON_LINE * s,
+      legs: legs.map(function (l) {
+        return ICON_LEGS[l.side < 0 ? 0 : 1][l.idx].map(function (q) { return b.p(q[0], q[1]); });
+      }),
+      abdomen: { x: ab.x, y: ab.y, rx: ICON_ABDOMEN.along * s, ry: ICON_ABDOMEN.across * s, rot: -Math.PI / 2 },
+      head: { x: hd.x, y: hd.y, rx: ICON_HEAD.r * s, ry: ICON_HEAD.r * s, rot: -Math.PI / 2 }
+    };
+  }
+  // ...and anything in between
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function lerpPt(a, b, t) { return { x: lerp(a.x, b.x, t), y: lerp(a.y, b.y, t) }; }
+  function lerpEllipse(a, b, t) {
+    return {
+      x: lerp(a.x, b.x, t), y: lerp(a.y, b.y, t), rx: lerp(a.rx, b.rx, t), ry: lerp(a.ry, b.ry, t),
+      rot: a.rot + Math.atan2(Math.sin(b.rot - a.rot), Math.cos(b.rot - a.rot)) * t
+    };
+  }
+  function lerpColor(a, b, t) {
+    var x = a.match(/[\d.]+/g).map(Number), y = b.match(/[\d.]+/g).map(Number);
+    return 'rgb(' + [0, 1, 2].map(function (i) { return Math.round(lerp(x[i], y[i], t)); }).join(', ') + ')';
+  }
+  function blend(a, b, t) {
+    return {
+      color: lerpColor(a.color, b.color, t), w1: lerp(a.w1, b.w1, t), w2: lerp(a.w2, b.w2, t),
+      legs: a.legs.map(function (seg, i) { return seg.map(function (q, j) { return lerpPt(q, b.legs[i][j], t); }); }),
+      abdomen: lerpEllipse(a.abdomen, b.abdomen, t),
+      head: lerpEllipse(a.head, b.head, t)
+    };
+  }
+  function drawPose(p) {
+    ctx.strokeStyle = p.color; ctx.fillStyle = p.color;
+    // Legs: thick near the body, thin at the foot
+    p.legs.forEach(function (s) {
+      ctx.lineWidth = p.w1; ctx.beginPath(); ctx.moveTo(s[0].x, s[0].y); ctx.lineTo(s[1].x, s[1].y); ctx.stroke();
+      ctx.lineWidth = p.w2; ctx.beginPath(); ctx.moveTo(s[1].x, s[1].y); ctx.lineTo(s[2].x, s[2].y); ctx.stroke();
+    });
+    // Body: abdomen behind, head and thorax in front
+    [p.abdomen, p.head].forEach(function (e) {
+      ctx.beginPath(); ctx.ellipse(e.x, e.y, e.rx, e.ry, e.rot, 0, Math.PI * 2); ctx.fill();
+    });
+  }
+
   function draw() {
     ctx.clearRect(0, 0, W, H);
     if (!body) return;
+    if (mode === 'emerge' && emergeWait > 0) return;   // still just the icon
     ctx.lineJoin = 'round'; ctx.lineCap = 'round';
 
     // Silk thread (active + retracting)
@@ -465,22 +613,9 @@
     var hop = flee && flee.hop < HOP_TIME ? 1 + 0.22 * Math.sin(Math.PI * flee.hop / HOP_TIME) : 1;
     ctx.save();
     ctx.translate(body.x, body.y); ctx.scale(hop, hop); ctx.translate(-body.x, -body.y);
-
-    // Legs: thick near the body, thin at the foot
-    ctx.strokeStyle = INK; ctx.fillStyle = INK;
-    legs.forEach(function (l) {
-      var hip = at(body.a + l.side * l.ang, HIP);
-      var lift = l.t >= 0 ? Math.sin(Math.PI * l.t) * LIFT : 0;
-      var k = knee(hip, l.foot, l.side, l.bend, lift);
-      ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(hip.x, hip.y); ctx.lineTo(k.x, k.y); ctx.stroke();
-      ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(k.x, k.y); ctx.lineTo(l.foot.x, l.foot.y); ctx.stroke();
-    });
-
-    // Body: abdomen behind, head and thorax in front
-    ctx.save(); ctx.translate(body.x, body.y); ctx.rotate(body.a);
-    ctx.beginPath(); ctx.ellipse(-9, 0, 8.5, 6.8, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(NECK, 0, 5.6, 4.8, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.restore();
+    // Shrinking into (or growing out of) the icon: ease between the two shapes
+    var m = morph > 0 ? (morph < 0.5 ? 4 * morph * morph * morph : 1 - Math.pow(-2 * morph + 2, 3) / 2) : 0;
+    drawPose(m > 0 ? blend(pose(), iconPose(), m) : pose());
     ctx.restore();   // end of hop
   }
 
@@ -498,7 +633,7 @@
   }
 
   function startLoop() {
-    if (raf || !on || document.hidden) return;
+    if (raf || !(on || body) || document.hidden) return;   // body while off = still walking home
     raf = requestAnimationFrame(loop);
   }
 
@@ -516,11 +651,14 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
-  function setOn(value) {
+  // animate: from the button. Off: walk home into the icon. On: grow out of the icon.
+  // Without it (page load, errors, reduced motion) it simply appears or disappears.
+  function setOn(value, animate) {
     on = value;
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     btn.dataset.tip = on ? 'Spider Off' : 'Spider On';
     try { if (on) localStorage.setItem('spider', '1'); else localStorage.removeItem('spider'); } catch (e) {}
+    animate = animate && iconShown();
     if (on) {
       if (!canvas) {
         canvas = document.createElement('canvas');
@@ -531,13 +669,22 @@
       }
       canvas.style.display = '';
       resize();
-      if (mouse && !body) spawn(mouse);
+      btn.classList.remove('homing');
+      if (animate && !body) {
+        // Grow out of the icon, facing up like it, once the strike-through has cleared
+        replay('strike-out');
+        spawn(iconBox().p(ICON_BODY[0], ICON_BODY[1]));
+        mode = 'emerge'; morph = 1; emergeWait = STRIKE_TIME;
+      } else if (mouse && !body) spawn(mouse);
+      last = performance.now();
+      startLoop();
+    } else if (animate && body) {
+      btn.classList.remove('strike-out');
+      btn.classList.add('homing');          // no strike-through until it's back in the icon
       last = performance.now();
       startLoop();
     } else {
-      stopLoop();
-      body = null; thread = null; loose = []; mode = 'walk'; roam = null; flee = null;
-      if (canvas) { ctx.clearRect(0, 0, W, H); canvas.style.display = 'none'; }
+      finishOff(animate);
     }
   }
 
@@ -557,7 +704,8 @@
     scare(e.clientX, e.clientY);
   }, { passive: true });
   window.addEventListener('resize', resize);
-  btn.addEventListener('click', function () { setOn(!on); });
+  btn.addEventListener('click', function () { setOn(!on, true); });
+  btn.addEventListener('animationend', function () { btn.classList.remove('strike-in', 'strike-out'); });
 
   // Pause in background tabs; on return, restart without a time jump
   document.addEventListener('visibilitychange', function () {
@@ -566,7 +714,7 @@
   });
 
   // If the visitor turns on "reduce motion" while it's running, switch it off
-  function onPolicyChange() { if (!allowed.matches && on) setOn(false); }
+  function onPolicyChange() { if (!allowed.matches && (on || body)) setOn(false); }
   if (allowed.addEventListener) allowed.addEventListener('change', onPolicyChange);
   else if (allowed.addListener) allowed.addListener(onPolicyChange);
 

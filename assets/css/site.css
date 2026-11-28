@@ -84,6 +84,13 @@ section[id] { scroll-margin-top: 72px; }
 .spider-toggle:hover, .spider-toggle[aria-pressed="true"] { color: var(--ink); }
 .spider-toggle[aria-pressed="true"] .strike { display: none; }   /* crossed out while the spider is off */
 .strike-gap { stroke: var(--paper); }
+/* The strike-through draws in once the spider has shrunk back into the icon, and clears before it grows out */
+.spider-toggle .strike path { stroke-dasharray: 25; }
+.spider-toggle.strike-in .strike path { animation: strike-draw .3s ease-out; }
+.spider-toggle.strike-out .strike { display: inline; }
+.spider-toggle.strike-out .strike path { animation: strike-draw .22s ease-in reverse forwards; }
+.spider-toggle.homing .strike { display: none; }   /* switched off, but the spider is still walking back */
+@keyframes strike-draw { from { stroke-dashoffset: 25; } to { stroke-dashoffset: 0; } }
 .tools { display: flex; align-items: center; gap: 14px; }
 
 /* Pill-shaped tooltips for the header buttons (text comes from data-tip) */
