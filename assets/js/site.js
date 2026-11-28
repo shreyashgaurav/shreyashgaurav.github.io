@@ -284,13 +284,16 @@
     var t = thread;
 
     // Gently accommodate small cursor nudges while swinging
-    var g = goal(), ox = g.x - t.gx, oy = g.y - t.gy, od = hyp(ox, oy);
-    if (od > TRACK_MAX) { g = { x: t.gx + ox / od * TRACK_MAX, y: t.gy + oy / od * TRACK_MAX }; }
-    var tk = 1 - Math.exp(-dt * 4);
-    var thWant = Math.atan2(g.x - t.ax, g.y - t.ay);
-    var lWant = hyp(g.x - t.ax, g.y - t.ay);
-    t.th1 += Math.atan2(Math.sin(thWant - t.th1), Math.cos(thWant - t.th1)) * tk;
-    t.l1 += (lWant - t.l1) * tk;
+    // (not once it has been switched off: then it just lands and heads home)
+    if (on) {
+      var g = goal(), ox = g.x - t.gx, oy = g.y - t.gy, od = hyp(ox, oy);
+      if (od > TRACK_MAX) { g = { x: t.gx + ox / od * TRACK_MAX, y: t.gy + oy / od * TRACK_MAX }; }
+      var tk = 1 - Math.exp(-dt * 4);
+      var thWant = Math.atan2(g.x - t.ax, g.y - t.ay);
+      var lWant = hyp(g.x - t.ax, g.y - t.ay);
+      t.th1 += Math.atan2(Math.sin(thWant - t.th1), Math.cos(thWant - t.th1)) * tk;
+      t.l1 += (lWant - t.l1) * tk;
+    }
 
     t.u = Math.min(1, t.u + dt / t.dur);
 
@@ -485,9 +488,11 @@
     stillFor += dt;
     loose = loose.filter(function (q) { q.retract += dt / RETRACT_TIME; return q.retract < 1; });
 
-    // Switched off: finish any swing, then walk home and shrink into the icon.
+    // Switched off: finish a swing already in the air (without following the cursor any more),
+    // then walk home and shrink into the icon.
     // Switched back on part-way: carry on from wherever it got to.
     if (!on) {
+      if (mode === 'shoot') { thread = null; mode = 'walk'; }   // silk not anchored yet: skip the swing
       if (mode === 'walk' || mode === 'flee') { mode = 'home'; flee = null; roam = null; homeSpeed = 0; arrived = 0; }
       else if (mode === 'emerge') mode = 'merge';
     } else if (mode === 'home') mode = 'walk';
